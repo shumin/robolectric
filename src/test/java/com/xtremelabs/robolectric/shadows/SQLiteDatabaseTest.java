@@ -37,7 +37,13 @@ public class SQLiteDatabaseTest {
 
     @After
     public void tearDown() throws Exception {
-        database.close();
+    	if(!database.isOpen())
+    		database = SQLiteDatabase.openDatabase("path", null, 0);
+    	
+    	database.execSQL("DROP Table if exists table_name");
+    	database.execSQL("DROP Table if exists auto_table");
+        
+    	database.close();
     }
 
     @Test
@@ -51,9 +57,8 @@ public class SQLiteDatabaseTest {
         values.put("second_column", byteColumnValue);
 
         database.insert("table_name", null, values);
-
+        
         Cursor cursor = database.query("table_name", new String[]{"second_column", "first_column"}, null, null, null, null, null);
-
         assertThat(cursor.moveToFirst(), equalTo(true));
 
         byte[] byteValueFromDatabase = cursor.getBlob(0);

@@ -1,7 +1,9 @@
 package com.xtremelabs.robolectric.shadows;
 
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -78,6 +80,39 @@ public class SQLiteOpenHelperTest {
         helper.close();
         assertThat(database.isOpen(), equalTo(false));
     }
+    
+    @Test
+    public void testMultipleDBReadWriteWithHelper() {
+    	SQLiteDatabase database = helper.getWritableDatabase();
+    	database.execSQL("CREATE TABLE table_name (\n" +
+                "  id INT PRIMARY KEY AUTOINCREMENT,\n" +
+                "  first_column VARCHAR(255),\n" +
+                "  second_column BINARY,\n" +
+                "  name VARCHAR(255),\n" +
+                "  big_int INTEGER\n" +
+                ");");
+    	
+    	String stringColumnValue = "column_value";
+        byte[] byteColumnValue = new byte[]{1, 2, 3};
+
+        ContentValues values = new ContentValues();
+        values.put("first_column", stringColumnValue);
+        values.put("second_column", byteColumnValue);
+
+        database.insert("table_name", null, values);
+        database.close();
+        
+        database = helper.getReadableDatabase();
+        Cursor cursor = database.query("table_name", new String[]{"second_column", "first_column"}, null, null, null, null, null);
+        assertThat(cursor.moveToFirst(), equalTo(true));
+
+        byte[] byteValueFromDatabase = cursor.getBlob(0);
+        String stringValueFromDatabase = cursor.getString(1);
+
+        assertThat(stringValueFromDatabase, equalTo(stringColumnValue));
+        assertThat(byteValueFromDatabase, equalTo(byteColumnValue));
+    }
+    
 
     private void assertInitialDB(SQLiteDatabase database) {
         assertDatabaseOpened(database);

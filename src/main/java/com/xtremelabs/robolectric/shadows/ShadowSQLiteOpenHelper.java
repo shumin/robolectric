@@ -40,7 +40,9 @@ public class ShadowSQLiteOpenHelper {
             database = SQLiteDatabase.openDatabase("path", null, 0);
             realHelper.onCreate(database);
         }
-
+        else if(!database.isOpen())
+        	database = SQLiteDatabase.openDatabase("path", null, 0);
+        
         realHelper.onOpen(database);
         return database;
     }
@@ -51,7 +53,9 @@ public class ShadowSQLiteOpenHelper {
             database = SQLiteDatabase.openDatabase("path", null, 0);
             realHelper.onCreate(database);
         }
-
+        else if(!database.isOpen())
+        	database = SQLiteDatabase.openDatabase("path", null, 0);
+        
         realHelper.onOpen(database);
         return database;
     }

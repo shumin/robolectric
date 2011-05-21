@@ -33,7 +33,7 @@ public class ShadowSQLiteDatabase {
     public static SQLiteDatabase openDatabase(String path, SQLiteDatabase.CursorFactory factory, int flags) {
         try {
             Class.forName("org.h2.Driver").newInstance();
-            connection = DriverManager.getConnection("jdbc:h2:mem:");
+            connection = DriverManager.getConnection("jdbc:h2:mem:db1;DB_CLOSE_DELAY=-1");
         } catch (Exception e) {
             throw new RuntimeException("SQL exception in openDatabase", e);
         }
