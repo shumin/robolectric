@@ -62,6 +62,21 @@ public class ShadowSQLiteDatabase {
         }
         return -1;
     }
+    
+    @Implementation
+    public Cursor rawQuery(String sql, String []selectionArg) {
+    	ResultSet resultSet;
+        try {
+            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            resultSet = statement.executeQuery(sql);
+        } catch (SQLException e) {
+            throw new RuntimeException("SQL exception in raw query", e);
+        }
+
+        SQLiteCursor cursor = new SQLiteCursor(null, null, null, null);
+        shadowOf(cursor).setResultSet(resultSet);
+        return cursor;
+    }
 
     @Implementation
     public Cursor query(boolean distinct, String table, String[] columns,

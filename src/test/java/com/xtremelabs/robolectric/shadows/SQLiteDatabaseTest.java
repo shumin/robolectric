@@ -67,6 +67,23 @@ public class SQLiteDatabaseTest {
         assertThat(stringValueFromDatabase, equalTo(stringColumnValue));
         assertThat(byteValueFromDatabase, equalTo(byteColumnValue));
     }
+    
+    @Test
+    public void testInsetAndCount() {
+    	String stringColumnValue = "column_value";
+        byte[] byteColumnValue = new byte[]{1, 2, 3};
+
+        ContentValues values = new ContentValues();
+
+        values.put("first_column", stringColumnValue);
+        values.put("second_column", byteColumnValue);
+
+        database.insert("table_name", null, values);
+        
+        Cursor c = database.rawQuery("select count(*) from table_name", null);
+        c.moveToFirst();
+        assertThat(c.getInt(0), equalTo(1));
+    }
 
     @Test
     public void testEmptyTable() throws Exception {
